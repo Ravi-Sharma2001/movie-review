@@ -1,0 +1,62 @@
+const Post = require('../models/Post');
+exports.getAllPosts = async (req,res,next) =>{
+    try{
+        const [posts,_] = await Post.findAll();
+        res.status(200).json({count: posts.length, posts})
+    }catch(error){
+        console.log(error);
+        next(error);
+    }
+}
+exports.createNewPost = async(req, res, next) =>{
+   try {
+    let { title, body } = req.body;
+    let post = new Post(title, body);
+    post = await post.save();
+    res.status(201).json({message: "Post created"})
+   } catch (error) {
+    console.log(error);
+    next(error);
+   }
+}
+
+exports.getPostById = async(req,res,next) =>{
+    try {
+        let postId = req.params.id;
+        let [post, _] = await Post.findById(postId);
+        res.status(200).json({ post: post[0] });
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+exports.regUser= async(req,res,next) =>{
+    try {
+        let obj = req.body;
+        await Post.register(obj.age, obj.gender, obj.name, obj.username, obj.password);
+        res.status(200).json({message:"sent"});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+exports.login = async(req,res,next) => {
+    try {
+        let obj = req.body;
+        Post.login(obj.username, obj.password);
+        res.status(200).json({message:"sent"});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+exports.reset = async(req,res,next) => {
+    try {
+        let obj = req.body;
+        Post.reset(obj.username, obj.password, obj.newpassword);
+        res.status(200).json({message:"sent"});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
