@@ -75,11 +75,11 @@ class Post {
     }
     static reset(username, password, newpassword){
         let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}';`;
-        db.query(sql).then(async ([row])=>{
+        return db.query(sql).then(async ([row])=>{
             console.log(row[0].count)
             if(row[0].count == 0){
                 //  WRONG USERNAME AND PASSWORD
-                console.log("INVALID CREDENTIALS")
+                console.log("username doesn't exist")
             }
             else{
                 let check = `SELECT * FROM UserProfile WHERE username = '${username}';`;
@@ -91,15 +91,17 @@ class Post {
                             let upd = `UPDATE UserProfile 
                             SET password = '${hashedPassword}'
                             WHERE username = '${username}';`;
-                            db.query(upd).then(([row])=>{
-                                console.log("SUCCESSFUL");
+                            return db.query(upd).then(([row])=>{
+                                return "SUCCESSFUL";
                             }).catch(error =>{
                                 throw error;
                             })
                         }
+                        else{
+                            return "WRONG PASSWORD"
+                        }
                     } catch (error) {
-                        console.log("WRONG PASSWORD")
-                        return "wrong password"
+                        throw error;
                     }
                 }).catch(error =>{
                     throw error;

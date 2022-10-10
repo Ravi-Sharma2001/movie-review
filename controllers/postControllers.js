@@ -67,7 +67,10 @@ exports.login = async(req,res,next) => {
 exports.reset = async(req,res,next) => {
     try {
         let obj = req.body;
-        Post.reset(obj.username, obj.password, obj.newpassword);
+        let result = await Post.reset(obj.username, obj.password, obj.newpassword);
+        return res.json({
+            result: result
+        })
         res.status(200).json({message:"sent"});
     } catch (error) {
         console.log(error);
