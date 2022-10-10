@@ -1,5 +1,6 @@
 const { json } = require('express');
 const db = require('../config/db');
+const bcrypt = require('bcryptjs')
 class Post {
     // constructor(title, body){
     //     this.title = title;
@@ -18,7 +19,7 @@ class Post {
     // }
     static register(age , gender, name, username , password){
         let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}';`;
-        db.query(sql).then(([row])=>{
+        db.query(sql).then(async ([row])=>{
             console.log(row[0].count)
             if(row[0].count != 0){
                 //  REGISTERATION NOT POSSIBLE
@@ -26,7 +27,9 @@ class Post {
             }
             else{
                 // INSERT into TABLE
-                let ins = `INSERT INTO UserProfile values(${age},'${gender}','${name}','${username}','${password}');`;
+                const hashedPassword = await bcrypt.hash(password,10)
+                console.log(hashedPassword)
+                let ins = `INSERT INTO UserProfile values(${age},'${gender}','${name}','${username}','${hashedPassword}');`;
                 db.query(ins).then(([row])=>{
                     console.log("SUCCESSFUL");
                 }).catch(error =>{
@@ -38,8 +41,8 @@ class Post {
             throw error;
         })
     };
-    static login(username, password){
-        let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}' and password = '${password}';`;
+    static async login(username, password){
+        let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}';`;
         db.query(sql).then(([row])=>{
             console.log(row[0].count)
             if(row[0].count == 0){
@@ -48,9 +51,18 @@ class Post {
             }
             else{
                 // LOGIN
-                let ins = `SELECT * FROM UserProfile WHERE username = '${username}' and password = '${password}';`;
-                db.query(ins).then(([row])=>{
-                    console.log(row);
+                let ins = `SELECT * FROM UserProfile WHERE username = '${username}';`;
+                db.query(ins).then(async ([row])=>{
+                    try {
+                        if(await bcrypt.compare(password,row[0].password)){
+                            console.log(row)
+                        }
+                        else{
+                            console.log("WRONG PASSWORD")
+                        }
+                    } catch (error) {
+                        throw error
+                    }
                 }).catch(error =>{
                     throw error;
                 })
