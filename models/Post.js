@@ -1,21 +1,21 @@
 const { json } = require('express');
 const db = require('../config/db');
 class Post {
-    constructor(title, body){
-        this.title = title;
-        this.body = body;
-    }
-    async save() {
-        let d = new Date();
-        let yyyy = d.getFullYear();
-        let mm = d.getMonth()+1;
-        let dd = d.getDate();
+    // constructor(title, body){
+    //     this.title = title;
+    //     this.body = body;
+    // }
+    // async save() {
+    //     let d = new Date();
+    //     let yyyy = d.getFullYear();
+    //     let mm = d.getMonth()+1;
+    //     let dd = d.getDate();
 
-        let createdAtDate = `${yyyy}-${mm}-${dd}`;
-        let sql =  `INSERT INTO posts(title, body, created_at) values('${this.title}','${this.body}','${createdAtDate}');`
+    //     let createdAtDate = `${yyyy}-${mm}-${dd}`;
+    //     let sql =  `INSERT INTO posts(title, body, created_at) values('${this.title}','${this.body}','${createdAtDate}');`
 
-            return db.execute(sql);
-    }
+    //         return db.execute(sql);
+    // }
     static register(age , gender, name, username , password){
         let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}';`;
         db.query(sql).then(([row])=>{
