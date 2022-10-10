@@ -1,3 +1,4 @@
+const { json } = require('express');
 const db = require('../config/db');
 class Post {
     constructor(title, body){
@@ -14,15 +15,6 @@ class Post {
         let sql =  `INSERT INTO posts(title, body, created_at) values('${this.title}','${this.body}','${createdAtDate}');`
 
             return db.execute(sql);
-    }
-
-    static findAll(){
-        let sql = "SELECT * FROM posts;";
-        return db.execute(sql);
-    }
-    static findById(id){
-        let sql =  `SELECT * FROM posts WHERE id = ${id};`;
-        return db.execute(sql);
     }
     static register(age , gender, name, username , password){
         let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}';`;
@@ -89,6 +81,37 @@ class Post {
         }).catch(error =>{
             throw error;
         })
+    }
+    //FIND MOVIES BY WORK ID
+    static findByWork(work_id){
+            let sql = `select movie_id as id from People WHERE work_id = '${work_id}';`;
+                db.query(sql).then(([row])=>{
+                    row.forEach(element => console.log(element))
+                }).catch(error =>{
+                    throw error;
+                })
+    }
+    //GET MOVIE INFO BY WORK ID
+    static findMovieByID(movie_id){
+        let sql = `select * from Movie WHERE movie_id = '${movie_id}';`;
+                db.query(sql).then(([row])=>{
+                    let review = `select * from Review WHERE movie_id = '${movie_id}';`;
+                    db.query(review).then(([result])=>{
+                        const resultt = {
+                            description: row,
+                            review: result
+                        }
+                         console.log(resultt)
+                    }).catch(error =>{
+                        throw error;
+                    })                    
+                }).catch(error =>{
+                    throw error;
+                })
+    }
+    static findAllMovies(){
+        let sql =  `select * from Movie;`;
+        return db.execute(sql);
     }
 };
 

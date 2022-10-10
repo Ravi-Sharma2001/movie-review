@@ -60,3 +60,31 @@ exports.reset = async(req,res,next) => {
         next(error);
     }
 }
+exports.findPeopleByID = async(req,res,next) => {
+    try {
+        Post.findByWork(req.body.work_id);
+        res.status(200).json({message:"sent"});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+exports.findMovieDetailsByID = async(req,res,next) => {
+    try {
+        Post.findMovieByID(req.body.movie_id);
+        res.status(200).json({message:"sent"});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    } 
+}
+exports.findAllMovie = async (req,res,next) => {
+    try {
+        let [val, _] = await Post.findAllMovies();
+        res.status(200).json({val});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+
