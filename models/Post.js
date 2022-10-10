@@ -1,6 +1,8 @@
 const { json } = require('express');
 const db = require('../config/db');
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+require("dotenv").config();
 class Post {
     // constructor(title, body){
     //     this.title = title;
@@ -43,7 +45,7 @@ class Post {
     };
     static async login(username, password){
         let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}';`;
-        db.query(sql).then(([row])=>{
+        return db.query(sql).then(([row])=>{
             console.log(row[0].count)
             if(row[0].count == 0){
                 //  WRONG USERNAME AND PASSWORD
@@ -52,16 +54,16 @@ class Post {
             else{
                 // LOGIN
                 let ins = `SELECT * FROM UserProfile WHERE username = '${username}';`;
-                db.query(ins).then(async ([row])=>{
+                return db.query(ins).then(async ([row])=>{
                     try {
                         if(await bcrypt.compare(password,row[0].password)){
-                            console.log(row)
-                        }
-                        else{
-                            console.log("WRONG PASSWORD")
+                            console.log(row[0])
+                            var jsonToken = jwt.sign({result: row[0].username}, process.env.ACCESS_KEY)
+                            return jsonToken
                         }
                     } catch (error) {
-                        throw error
+                        console.log("WRONG PASSWORD")
+                        return "wrong password"
                     }
                 }).catch(error =>{
                     throw error;
@@ -72,20 +74,33 @@ class Post {
         })
     }
     static reset(username, password, newpassword){
-        let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}' and password = '${password}';`;
-        db.query(sql).then(([row])=>{
+        let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}';`;
+        db.query(sql).then(async ([row])=>{
             console.log(row[0].count)
             if(row[0].count == 0){
                 //  WRONG USERNAME AND PASSWORD
                 console.log("INVALID CREDENTIALS")
             }
             else{
-                // LOGIN
-                let ins = `UPDATE UserProfile 
-                SET password = '${newpassword}'
-                WHERE username = '${username}' and password = '${password}';`;
-                db.query(ins).then(([row])=>{
-                    console.log("SUCCESSFUL");
+                let check = `SELECT * FROM UserProfile WHERE username = '${username}';`;
+                return db.query(check).then(async ([row])=>{
+                    try {
+                        if(await bcrypt.compare(password,row[0].password)){
+                            const hashedPassword = await bcrypt.hash(newpassword,10)
+                            console.log(hashedPassword)
+                            let upd = `UPDATE UserProfile 
+                            SET password = '${hashedPassword}'
+                            WHERE username = '${username}';`;
+                            db.query(upd).then(([row])=>{
+                                console.log("SUCCESSFUL");
+                            }).catch(error =>{
+                                throw error;
+                            })
+                        }
+                    } catch (error) {
+                        console.log("WRONG PASSWORD")
+                        return "wrong password"
+                    }
                 }).catch(error =>{
                     throw error;
                 })
