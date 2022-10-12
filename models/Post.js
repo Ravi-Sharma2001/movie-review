@@ -21,7 +21,7 @@ class Post {
     // }
     static register(age , gender, name, username , password){
         let sql = `SELECT COUNT(username) as count FROM UserProfile WHERE username = '${username}';`;
-        db.query(sql).then(async ([row])=>{
+        return db.query(sql).then(async ([row])=>{
             console.log(row[0].count)
             if(row[0].count != 0){
                 //  REGISTERATION NOT POSSIBLE
@@ -31,9 +31,9 @@ class Post {
                 // INSERT into TABLE
                 const hashedPassword = await bcrypt.hash(password,10)
                 console.log(hashedPassword)
-                let ins = `INSERT INTO UserProfile values(${age},'${gender}','${name}','${username}','${hashedPassword}');`;
-                db.query(ins).then(([row])=>{
-                    console.log("SUCCESSFUL");
+                let ins =`INSERT INTO UserProfile values(${age},'${gender}','${name}','${username}','${hashedPassword}');`;
+                return db.query(ins).then(([row])=>{
+                    return 1
                 }).catch(error =>{
                     throw error;
                 })

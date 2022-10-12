@@ -9,7 +9,8 @@ app.use(express.json()); // parse json bodies in the request object
 // Redirect requests to endpoint starting with /posts to postRoutes.js
 app.use("/posts", require("./routes/postRoutes"));
 app.get("/posts", (req, res) => {
-   res.sendFile('/Users/sanketkar/Desktop/DBSProj/MOVIEREVIEW/public/login.html')
+  res.sendFile('D:/DBMS github/Formik-and-Yup-Reactjs-master/src/App.js')
+   //res.sendFile('login-form-v1/Login_v1/index2.html', { root: __dirname })
   console.log("hiii")
 
 })
